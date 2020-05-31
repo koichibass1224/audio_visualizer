@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <title>audio_visualizer_2.0</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="audiovis.css">
+  </head>
+  
+<body>
+
+<!--audio_visualizerを作成しました。お洒落な見た目にできるよう頑張りました！web audio APIというものを使用して、受け取ったデータを図形の直径に反映して、変化するようになっています。いくつかパターンも用意しています。
+また、firestorageを利用してchatもできるようにしたので、他の人と好きな音楽の話をできるようなイメージにしました。videoツールも取り入れたので、簡易的なライブyoutube配信のようなものができればと考えたアプリです！（safariでは起動しません）-->
+<div class="wrapper top_title" >
+    <canvas id="c"class="c" width="700" height="700"></canvas>
+    <canvas class="c2" id="c2" width="700" height="700"></canvas>
+    <input type="button" value="enter" id="enter" class="btn btn-info btn-lg">
+</div>
+
+<div class="wrapper visualizer_title" style="display:none;">
+    <canvas class="visualizer" width="700" height="700"></canvas> 
+    <!--visualizer2以降は後ろで走らせないと動作が止まってしまう-->
+    <canvas class="visualizer1" width="700" height="700" style="display:none;"></canvas>
+    <canvas class="visualizer2" width="700" height="700" style="display:none;"></canvas>
+    <canvas class="visualizer3" width="700" height="700" style="display:none;"></canvas>
+    <canvas class="visualizer4" width="700" height="700" style="display:none;"></canvas>
+    <canvas class="visualizer5" width="700" height="700" style="display:none;"></canvas>
+    <canvas class="visualizer6" width="700" height="700" style="display:none;"></canvas>
+    <div class="videoPreview" id="videoPreview" style="display:none;"></div>
+    
+      <audio id="sound" preload="auto" controls></audio>
+      <div class="range-slider">
+
+      <span>Distortion: </span>  
+        <input type="range" id="range" value="0">
+      </div>
+      
+      <div class="eq">
+        <div class="controls">
+          <label>Low Gain</label>
+          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'lowGain');"></input>
+        </div>
+        <div class="controls">
+          <label>Mid Gain</label>
+          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'midGain');"></input>
+        </div>
+        <div class="controls">
+          <label>High Gain</label>
+          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'highGain');"></input>
+        </div>
+      </div>
+
+    <div class="input button1">
+        <input type="button" value="change1" id="visualizer1" class="btn btn-primary btn-lg">
+        <input type="button" value="change2" id="visualizer2" class="btn btn-primary btn-lg">
+        <input type="button" value="change3" id="visualizer3" class="btn btn-primary btn-lg">
+        <input type="button" value="change4" id="visualizer4" class="btn btn-primary btn-lg">
+        <input type="button" value="change5" id="visualizer5" class="btn btn-primary btn-lg">
+        <input type="button" value="destotion" id="dest" class="btn btn-primary btn-lg">
+      </div>
+
+      <div class="input tool">
+        <textarea class="text" id="text" cols="20" rows="10" placeholder="Comment here and push Enter or Click send button . Soon you will find message on display ."></textarea>
+        <button id="send"class="btn btn-primary btn-lg">send</button>
+      </div>
+
+      <div class="input button2">
+        <input type="button" value="video" id="video_onoff" class="btn btn-info btn-lg">
+        <input type="button" value="title_off" id="title" class="btn btn-info btn-lg">
+        <input type="button" value="image_off" id="image" class="btn btn-info btn-lg">
+      </div>
+
+        <div class="comment" id="output" style="display:none;" >comment</div>
+        <h3 class="songtitle">! Drag and watch your music on it !</h3>
+        <div class="comment_balance" id="output2">comment</div>
+    
+</div>
+<!--bootstrap-->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+  <script src="top.js"></script>
+  <script src="audiovis.js"></script>
+  <script type="text/javascript" src="image_camera.js"></script>
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase.js"></script>
+  <script>
+    var firebaseConfig = {
+    apiKey: "AIzaSyC2NFPXT2Dkit93emid1gv7qC-L0_r73ps",
+    authDomain: "devchat-a087c.firebaseapp.com",
+    databaseURL: "https://devchat-a087c.firebaseio.com",
+    projectId: "devchat-a087c",
+    storageBucket: "devchat-a087c.appspot.com",
+    messagingSenderId: "1097531554624",
+    appId: "1:1097531554624:web:f7027c87590a46a7f518a5"
+    };
+    firebase.initializeApp(firebaseConfig);
+      //データベースのクラス分け
+      let room = "chat_room";
+      const newPostRef = firebase.database().ref(room);
+
+    $("#send").on("click", function () {
+        newPostRef.push({
+        text: $("#text").val(),
+    })
+        $("#text").val("");
+     });
+    newPostRef.on("child_added", function (data) {
+        let v = data.val(); 
+        let str =
+        `<p>${v.text}</p>`;
+        //表示コメント・残存コメント両方にデータを反映
+        $("#output").prepend(str);
+        $("#output2").prepend(str);
+   });
+
+   $("#text").on("keydown", function (e) {
+      if (e.keyCode === 13){//enter
+        newPostRef.push({
+        text: $("#text").val(),
+      })
+        $("#text").val("");
+        }
+      });
+  </script>
+
+<script>
+    $("#enter").on("click", function () {
+      $(".top_title").fadeOut(500);
+      setTimeout(function () {$(".visualizer_title").fadeIn(500)}, 500);
+    });
+</script>
+
+<script>
+  //classで入れ替えているので、一度dblclickで解除が必要
+  $("#visualizer1").on("click", function () {
+    $(".visualizer").addClass('visualizer1');
+    });
+  $("#visualizer1").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer1');
+    });
+  $("#visualizer2").on("click", function () {
+    $(".visualizer").addClass('visualizer2');
+    });
+  $("#visualizer2").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer2');
+    });
+  $("#visualizer3").on("click", function () {
+    $(".visualizer").addClass('visualizer3');
+    });
+  $("#visualizer3").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer3');
+    });
+  $("#visualizer4").on("click", function () {
+    $(".visualizer").addClass('visualizer4');
+    });
+  $("#visualizer4").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer4');
+    });
+  $("#visualizer5").on("click", function () {
+    $(".visualizer").addClass('visualizer5');
+    });
+  $("#visualizer5").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer5');
+    });
+  $("#visualizer6").on("click", function () {
+    $(".visualizer").addClass('visualizer6');
+    });
+  $("#visualizer6").on("dblclick", function () {
+    $(".visualizer").removeClass('visualizer6');
+    });
+
+  $("#video_onoff").on("click", function () {
+      $(".videoPreview").fadeIn(500);
+      $(".visualizer").fadeOut(500);
+  });
+  $("#video_onoff").on("dblclick", function () {
+      $(".videoPreview").fadeOut(500);
+      $(".visualizer").fadeIn(500);
+  });
+
+  $("#title").on("click", function () {
+    $(".songtitle").fadeOut(500);
+    });
+  $("#title").on("dblclick", function () {
+      $(".songtitle").fadeIn(500);
+    });
+  $("#image").on("click", function () {
+    $(".visualizer").fadeOut(500);
+    });
+  $("#image").on("dblclick", function () {
+      $(".visualizer").fadeIn(500);
+    });
+
+  //UI向上のため：placeholder入れ替え
+  $("#send").on("click", function () {
+      $(".comment").fadeIn(50);
+      $('#text').attr('placeholder','Do continue to comment by pusshing Enter or click!');
+      setTimeout(function () {$(".comment").fadeOut(2000)}, 2000);
+  });
+  $("#text").on("keydown", function (e) {
+      if (e.keyCode === 13){//enter
+      $(".comment").fadeIn(50);
+      $('#text').attr('placeholder','Do continue to comment by pusshing Enter or click!');
+      setTimeout(function () {$(".comment").fadeOut(2000)}, 2000);
+      }
+  });
+</script>
+  
+
+</body>
+</html>
