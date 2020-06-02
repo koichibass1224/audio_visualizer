@@ -130,7 +130,7 @@ range2.addEventListener('input',function changeGain(string,type){
 function createAnalyser() {
   analyser = audioCtx.createAnalyser();//analyzer生成
   analyser.smoothingTimeConstant = 0.85;//参考：https://www.g200kg.com/jp/docs/webaudio/analyser.html
-  analyser.fftSize =32; 
+  analyser.fftSize =128; 
   // avaliable values: 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, and 32768
   //bit数によって模様が変わる。averageは2048だが256以降読み込みが遅くなる上、図形が潰れる。
 }
