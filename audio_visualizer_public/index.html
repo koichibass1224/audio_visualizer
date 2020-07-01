@@ -14,8 +14,6 @@
   
 <body>
 
-<!--audio_visualizerを作成しました。お洒落な見た目にできるよう頑張りました！web audio APIというものを使用して、受け取ったデータを図形の直径に反映して、変化するようになっています。いくつかパターンも用意しています。
-また、firestorageを利用してchatもできるようにしたので、他の人と好きな音楽の話をできるようなイメージにしました。videoツールも取り入れたので、簡易的なライブyoutube配信のようなものができればと考えたアプリです！（safariでは起動しません）-->
 <div class="wrapper top_title" >
     <canvas id="c"class="c" width="700" height="700"></canvas>
     <canvas class="c2" id="c2" width="700" height="700"></canvas>
@@ -24,7 +22,6 @@
 
 <div class="wrapper visualizer_title" style="display:none;">
     <canvas class="visualizer" width="700" height="700"></canvas> 
-    <!--visualizer2以降は後ろで走らせないと動作が止まってしまう-->
     <canvas class="visualizer1" width="700" height="700" style="display:none;"></canvas>
     <canvas class="visualizer2" width="700" height="700" style="display:none;"></canvas>
     <canvas class="visualizer3" width="700" height="700" style="display:none;"></canvas>
@@ -39,21 +36,7 @@
       <span>Distortion: </span>  
         <input type="range" id="range" value="0">
       </div>
-      
-      <div class="eq">
-        <div class="controls">
-          <label>Low Gain</label>
-          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'lowGain');"></input>
-        </div>
-        <div class="controls">
-          <label>Mid Gain</label>
-          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'midGain');"></input>
-        </div>
-        <div class="controls">
-          <label>High Gain</label>
-          <input id="range2" type="range" value="100" step="1" min="0" max="100" oninput="changeGain(this.value, 'highGain');"></input>
-        </div>
-      </div>
+
 
     <div class="input button1">
         <input type="button" value="change1" id="visualizer1" class="btn btn-primary btn-lg">
@@ -64,20 +47,13 @@
         <input type="button" value="destotion" id="dest" class="btn btn-primary btn-lg">
       </div>
 
-      <div class="input tool">
-        <textarea class="text" id="text" cols="20" rows="10" placeholder="Comment here and push Enter or Click send button . Soon you will find message on display ."></textarea>
-        <button id="send"class="btn btn-primary btn-lg">send</button>
-      </div>
-
       <div class="input button2">
         <input type="button" value="video" id="video_onoff" class="btn btn-info btn-lg">
         <input type="button" value="title_off" id="title" class="btn btn-info btn-lg">
         <input type="button" value="image_off" id="image" class="btn btn-info btn-lg">
       </div>
 
-        <div class="comment" id="output" style="display:none;" >comment</div>
         <h3 class="songtitle">! Drag and watch your music on it !</h3>
-        <div class="comment_balance" id="output2">comment</div>
     
 </div>
 <!--bootstrap-->
@@ -94,45 +70,6 @@
 
 <!-- The core Firebase JS SDK is always required and must be listed first -->
   <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase.js"></script>
-  <script>
-    var firebaseConfig = {
-    apiKey: "AIzaSyC2NFPXT2Dkit93emid1gv7qC-L0_r73ps",
-    authDomain: "devchat-a087c.firebaseapp.com",
-    databaseURL: "https://devchat-a087c.firebaseio.com",
-    projectId: "devchat-a087c",
-    storageBucket: "devchat-a087c.appspot.com",
-    messagingSenderId: "1097531554624",
-    appId: "1:1097531554624:web:f7027c87590a46a7f518a5"
-    };
-    firebase.initializeApp(firebaseConfig);
-      //データベースのクラス分け
-      let room = "chat_room";
-      const newPostRef = firebase.database().ref(room);
-
-    $("#send").on("click", function () {
-        newPostRef.push({
-        text: $("#text").val(),
-    })
-        $("#text").val("");
-     });
-    newPostRef.on("child_added", function (data) {
-        let v = data.val(); 
-        let str =
-        `<p>${v.text}</p>`;
-        //表示コメント・残存コメント両方にデータを反映
-        $("#output").prepend(str);
-        $("#output2").prepend(str);
-   });
-
-   $("#text").on("keydown", function (e) {
-      if (e.keyCode === 13){//enter
-        newPostRef.push({
-        text: $("#text").val(),
-      })
-        $("#text").val("");
-        }
-      });
-  </script>
 
 <script>
     $("#enter").on("click", function () {
@@ -142,7 +79,6 @@
 </script>
 
 <script>
-  //classで入れ替えているので、一度dblclickで解除が必要
   $("#visualizer1").on("click", function () {
     $(".visualizer").addClass('visualizer1');
     });
@@ -202,7 +138,6 @@
       $(".visualizer").fadeIn(500);
     });
 
-  //UI向上のため：placeholder入れ替え
   $("#send").on("click", function () {
       $(".comment").fadeIn(50);
       $('#text').attr('placeholder','Do continue to comment by pusshing Enter or click!');
